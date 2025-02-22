@@ -16,6 +16,8 @@ public class Client {
     private String clientId;
     @Column(nullable = false)
     private Instant clientIdIssuedAt;
+    private String clientSecret;
+    private Instant clientSecretExpiresAt;
     @Column(nullable = false)
     private String clientName;
     @Column(length = 1000)

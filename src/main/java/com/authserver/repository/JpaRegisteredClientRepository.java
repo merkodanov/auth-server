@@ -67,6 +67,8 @@ public class JpaRegisteredClientRepository implements RegisteredClientRepository
         RegisteredClient.Builder builder = RegisteredClient.withId(client.getId())
                 .clientId(client.getClientId())
                 .clientIdIssuedAt(client.getClientIdIssuedAt())
+                .clientSecret(client.getClientSecret())
+                .clientSecretExpiresAt(client.getClientSecretExpiresAt())
                 .clientName(client.getClientName())
                 .clientAuthenticationMethods(authenticationMethods ->
                         clientAuthenticationMethods.forEach(authenticationMethod ->
@@ -100,6 +102,8 @@ public class JpaRegisteredClientRepository implements RegisteredClientRepository
         entity.setId(registeredClient.getId());
         entity.setClientId(registeredClient.getClientId());
         entity.setClientIdIssuedAt(registeredClient.getClientIdIssuedAt());
+        entity.setClientSecret(registeredClient.getClientSecret());
+        entity.setClientSecretExpiresAt(registeredClient.getClientSecretExpiresAt());
         entity.setClientName(registeredClient.getClientName());
         entity.setClientAuthenticationMethods(StringUtils.collectionToCommaDelimitedString(clientAuthenticationMethods));
         entity.setAuthorizationGrantTypes(StringUtils.collectionToCommaDelimitedString(authorizationGrantTypes));

@@ -74,24 +74,26 @@ public class SecurityConfig {
     }
 
     @Bean
-    public RegisteredClientRepository registeredClientRepository(ClientRepository clientRepository) {
+    public RegisteredClientRepository registeredClientRepository(ClientRepository clientRepository,
+                                                                 PasswordEncoder passwordEncoder) {
         RegisteredClient todolistClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("todolist")
                 .clientIdIssuedAt(Instant.now())
-                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+                .clientSecret(passwordEncoder.encode("secret"))
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .redirectUri("http://127.0.0.1:8080/authorized")
                 .scope(OidcScopes.OPENID)
                 .scope(OidcScopes.PROFILE)
                 .scope("addTodo")
                 .clientSettings(ClientSettings.builder()
                         .requireAuthorizationConsent(true)
-                        .requireProofKey(true)
                         .build())
                 .build();
 
         RegisteredClientRepository registeredClientRepository = new JpaRegisteredClientRepository(clientRepository);
-        if (registeredClientRepository.findByClientId(todolistClient.getClientName()) != null) {
+        if (registeredClientRepository.findByClientId(todolistClient.getClientName()) == null) {
             registeredClientRepository.save(todolistClient);
 
         }
