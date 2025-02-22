@@ -21,6 +21,8 @@ public class Client {
     @Column(length = 1000)
     private String clientAuthenticationMethods;
     @Column(length = 1000)
+    private String authorizationGrantTypes;
+    @Column(length = 1000)
     private String redirectUris;
     @Column(nullable = false)
     private String scopes;
