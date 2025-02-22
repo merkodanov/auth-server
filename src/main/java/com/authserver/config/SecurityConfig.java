@@ -1,5 +1,7 @@
 package com.authserver.config;
 
+import com.authserver.repository.ClientRepository;
+import com.authserver.repository.JpaRegisteredClientRepository;
 import com.authserver.repository.UserRepository;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -20,7 +22,6 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
@@ -38,6 +39,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.time.Instant;
 import java.util.UUID;
 
 @Configuration
@@ -72,9 +74,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public RegisteredClientRepository registeredClientRepository() {
+    public RegisteredClientRepository registeredClientRepository(ClientRepository clientRepository) {
         RegisteredClient todolistClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("todolist-client")
+                .clientId("todolist")
+                .clientIdIssuedAt(Instant.now())
                 .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .redirectUri("http://127.0.0.1:8080/authorized")
@@ -86,7 +89,13 @@ public class SecurityConfig {
                         .requireProofKey(true)
                         .build())
                 .build();
-        return new InMemoryRegisteredClientRepository(todolistClient);
+
+        RegisteredClientRepository registeredClientRepository = new JpaRegisteredClientRepository(clientRepository);
+        if (registeredClientRepository.findByClientId(todolistClient.getClientName()) != null) {
+            registeredClientRepository.save(todolistClient);
+
+        }
+        return registeredClientRepository;
     }
 
     @Bean

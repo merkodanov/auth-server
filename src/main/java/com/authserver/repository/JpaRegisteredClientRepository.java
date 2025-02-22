@@ -12,7 +12,6 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.jackson2.OAuth2AuthorizationServerJackson2Module;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.util.Assert;
 
@@ -21,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
-@Component
 public class JpaRegisteredClientRepository implements RegisteredClientRepository {
     private final ClientRepository clientRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -51,7 +49,7 @@ public class JpaRegisteredClientRepository implements RegisteredClientRepository
     @Override
     public RegisteredClient findByClientId(String clientId) {
         Assert.hasText(clientId, "clientId cannot be empty");
-        return this.clientRepository.findClientById(clientId).map(this::toObject).orElse(null);
+        return this.clientRepository.findClientByClientId(clientId).map(this::toObject).orElse(null);
     }
 
     private RegisteredClient toObject(Client client) {
@@ -61,6 +59,8 @@ public class JpaRegisteredClientRepository implements RegisteredClientRepository
                 client.getAuthorizationGrantTypes());
         Set<String> redirectUris = StringUtils.commaDelimitedListToSet(
                 client.getRedirectUris());
+        Set<String> postLogoutRedirectUris = StringUtils.commaDelimitedListToSet(
+                client.getPostLogoutRedirectUris());
         Set<String> clientScopes = StringUtils.commaDelimitedListToSet(
                 client.getScopes());
 
@@ -75,6 +75,7 @@ public class JpaRegisteredClientRepository implements RegisteredClientRepository
                         authorizationGrantTypes.forEach(grantType ->
                                 grantTypes.add(resolveAuthorizationGrantType(grantType))))
                 .redirectUris((uris) -> uris.addAll(redirectUris))
+                .postLogoutRedirectUris((uris) -> uris.addAll(postLogoutRedirectUris))
                 .scopes((scopes) -> scopes.addAll(clientScopes));
 
         Map<String, Object> clientSettingsMap = parseMap(client.getClientSettings());
@@ -103,6 +104,7 @@ public class JpaRegisteredClientRepository implements RegisteredClientRepository
         entity.setClientAuthenticationMethods(StringUtils.collectionToCommaDelimitedString(clientAuthenticationMethods));
         entity.setAuthorizationGrantTypes(StringUtils.collectionToCommaDelimitedString(authorizationGrantTypes));
         entity.setRedirectUris(StringUtils.collectionToCommaDelimitedString(registeredClient.getRedirectUris()));
+        entity.setPostLogoutRedirectUris(StringUtils.collectionToCommaDelimitedString(registeredClient.getPostLogoutRedirectUris()));
         entity.setScopes(StringUtils.collectionToCommaDelimitedString(registeredClient.getScopes()));
         entity.setClientSettings(writeMap(registeredClient.getClientSettings().getSettings()));
         entity.setTokenSettings(writeMap(registeredClient.getTokenSettings().getSettings()));

@@ -24,6 +24,8 @@ public class Client {
     private String authorizationGrantTypes;
     @Column(length = 1000)
     private String redirectUris;
+    @Column(length = 1000)
+    private String postLogoutRedirectUris;
     @Column(nullable = false)
     private String scopes;
     @Column(nullable = false, length = 2000)
