@@ -1,5 +1,6 @@
 package com.authserver.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -17,6 +18,7 @@ import java.util.List;
 @Data
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
+@JsonDeserialize(using = UserDeserializer.class)
 public class User implements UserDetails {
     @Serial
     private static final long serialVersionUID = 1L;
