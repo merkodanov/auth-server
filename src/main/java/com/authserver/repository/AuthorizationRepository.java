@@ -15,7 +15,7 @@ public interface AuthorizationRepository extends CrudRepository<Authorization, S
     Optional<Authorization> findByOidcIdTokenValue(String idToken);
     Optional<Authorization> findByUserCodeValue(String userCode);
     Optional<Authorization> findByDeviceCodeValue(String deviceCode);
-    @Query("select a from authorization a where a.state = :token" +
+    @Query("select a from Authorization a where a.state = :token" +
             " or a.authorizationCodeValue = :token" +
             " or a.accessTokenValue = :token" +
             " or a.refreshTokenValue = :token" +

@@ -58,7 +58,7 @@ CREATE TABLE if not exists "authorization" (
                                device_code_metadata varchar(2000) DEFAULT NULL,
                                PRIMARY KEY (id)
 );
-CREATE TABLE authorizationConsent (
+CREATE TABLE authorization_consent (
                                       registered_client_id varchar(255) NOT NULL,
                                       principal_name varchar(255) NOT NULL,
                                       authorities varchar(1000) NOT NULL,
