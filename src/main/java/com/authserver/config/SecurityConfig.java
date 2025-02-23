@@ -93,7 +93,7 @@ public class SecurityConfig {
                 .build();
 
         RegisteredClientRepository registeredClientRepository = new JpaRegisteredClientRepository(clientRepository);
-        if (registeredClientRepository.findByClientId(todolistClient.getClientName()) == null) {
+        if (registeredClientRepository.findByClientId(todolistClient.getClientId()) == null) {
             registeredClientRepository.save(todolistClient);
 
         }
@@ -147,6 +147,8 @@ public class SecurityConfig {
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.addAllowedOrigin("http://127.0.0.1:8080");
+        config.addAllowedOrigin("http://localhost:5173");
+        config.addAllowedOrigin("http://127.0.0.1:5173");
         config.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", config);
         return source;
