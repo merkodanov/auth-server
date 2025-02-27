@@ -8,3 +8,4 @@ spring:
     url: jdbc:postgresql://localhost:5432/auth_server
 server:
   port: 9000
+debug: true
