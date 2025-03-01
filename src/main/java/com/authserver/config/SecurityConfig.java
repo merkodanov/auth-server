@@ -74,7 +74,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize ->
                         authorize.anyRequest().authenticated())
-                .formLogin(Customizer.withDefaults());
+                .formLogin(formLogin -> formLogin.loginPage("/login").permitAll());
         return http.build();
     }
 
