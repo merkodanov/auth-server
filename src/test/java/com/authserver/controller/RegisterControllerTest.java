@@ -25,7 +25,7 @@ class RegisterControllerTest {
 
     @Test
     void getRegistrationForm_load_success() throws Exception {
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/register"))
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/signup"))
                 .andReturn();
 
         Assertions.assertNotNull(result.getModelAndView());
@@ -37,7 +37,7 @@ class RegisterControllerTest {
         User user = new User("Vlad", "password", "vladislavik@gmail.com", "ROLE_USER");
         Mockito.when(userService.saveUser(Mockito.any(User.class))).thenReturn(true);
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/register")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/signup")
                         .param("username", user.getUsername())
                         .param("email", user.getEmail())
                         .param("password", user.getPassword()))
