@@ -24,7 +24,16 @@ class RegisterControllerTest {
     private UserService userService;
 
     @Test
-    void register_user_is_success() throws Exception {
+    void getRegistrationForm_load_success() throws Exception {
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/register"))
+                .andReturn();
+
+        Assertions.assertNotNull(result.getModelAndView());
+        Assertions.assertEquals("registration", result.getModelAndView().getViewName());
+    }
+
+    @Test
+    void registerUser_is_success() throws Exception {
         User user = new User("Vlad", "password", "vladislavik@gmail.com", "ROLE_USER");
         Mockito.when(userService.saveUser(Mockito.any(User.class))).thenReturn(true);
 

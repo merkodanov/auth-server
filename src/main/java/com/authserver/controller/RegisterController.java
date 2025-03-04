@@ -3,10 +3,13 @@ package com.authserver.controller;
 import com.authserver.model.User;
 import com.authserver.service.UserService;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequestMapping("/register")
 public class RegisterController {
     final UserService userService;
 
@@ -14,7 +17,12 @@ public class RegisterController {
         this.userService = userService;
     }
 
-    @PostMapping("/register")
+    @GetMapping
+    public String registerUser() {
+        return "registration";
+    }
+
+    @PostMapping
     public String registerUser(@ModelAttribute User user) {
         userService.saveUser(user);
 
