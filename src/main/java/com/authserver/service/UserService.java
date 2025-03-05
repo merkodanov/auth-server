@@ -15,7 +15,7 @@ public class UserService {
     }
 
     public boolean saveUser(User user) {
-        if (userRepository.findByUsername(user.getUsername()) != null){
+        if (userRepository.findByUsername(user.getUsername()) != null) {
             throw new UserExistException("User already exists!");
         }
         userRepository.save(user);

@@ -1,11 +1,7 @@
 package com.authserver.service;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.authserver.model.AuthorizationConsent;
 import com.authserver.repository.AuthorizationConsentRepository;
-
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,6 +12,9 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class JpaOAuth2AuthorizationConsentService implements OAuth2AuthorizationConsentService {

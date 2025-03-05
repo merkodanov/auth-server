@@ -39,7 +39,7 @@ class UserServiceTest {
     }
 
     @Test
-    void saveUser_is_success(){
+    void saveUser_is_success() {
         Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(null);
         Mockito.when(userRepository.save(user)).thenReturn(user);
 
