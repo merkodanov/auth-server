@@ -1,6 +1,6 @@
 package com.authserver.controller;
 
-import com.authserver.model.User;
+import com.authserver.dto.UserRequestDTO;
 import com.authserver.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,8 +24,8 @@ public class RegisterController {
     }
 
     @PostMapping
-    public String registerUser(@ModelAttribute User user) {
-        userService.saveUser(user);
+    public String registerUser(@ModelAttribute UserRequestDTO userRequestDTO) {
+        userService.saveUser(userRequestDTO);
 
         return "registration-success";
     }

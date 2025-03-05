@@ -1,5 +1,6 @@
 package com.authserver.service;
 
+import com.authserver.dto.UserRequestDTO;
 import com.authserver.exceptions.UserExistException;
 import com.authserver.model.User;
 import com.authserver.repository.UserRepository;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class UserServiceTest {
 
     private User user;
+    private UserRequestDTO userRequestDTO;
 
     @InjectMocks
     private UserService userService;
@@ -25,17 +27,19 @@ class UserServiceTest {
 
     @BeforeEach
     void initUser() {
-        user = new User("Vlad",
+        userRequestDTO = new UserRequestDTO("Vlad",
                 "qwerty123",
-                "email@gmail.com",
-                "ROLE_USER");
+                "email@gmail.com");
+        user = new User(userRequestDTO.getUsername(),
+                userRequestDTO.getPassword(),
+                userRequestDTO.getEmail());
     }
 
     @Test
     void saveUser_user_is_exists() {
         Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(user);
 
-        Assertions.assertThrows(UserExistException.class, () -> userService.saveUser(user));
+        Assertions.assertThrows(UserExistException.class, () -> userService.saveUser(userRequestDTO));
     }
 
     @Test
@@ -43,7 +47,7 @@ class UserServiceTest {
         Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(null);
         Mockito.when(userRepository.save(user)).thenReturn(user);
 
-        boolean result = userService.saveUser(user);
+        boolean result = userService.saveUser(userRequestDTO);
 
         Assertions.assertTrue(result);
     }

@@ -31,6 +31,13 @@ public class User implements UserDetails {
     private final String email;
     private final String role;
 
+    public User(String username, String password, String email){
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.role = "ROLE_USER";
+    }
+
     @Override
     @Transient
     public Collection<? extends GrantedAuthority> getAuthorities() {

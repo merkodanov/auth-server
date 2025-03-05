@@ -1,6 +1,6 @@
 package com.authserver.controller;
 
-import com.authserver.model.User;
+import com.authserver.dto.UserRequestDTO;
 import com.authserver.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,17 +34,17 @@ class RegisterControllerTest {
 
     @Test
     void registerUser_is_success() throws Exception {
-        User user = new User("Vlad", "password", "vladislavik@gmail.com", "ROLE_USER");
-        Mockito.when(userService.saveUser(Mockito.any(User.class))).thenReturn(true);
+        UserRequestDTO userRequestDTO = new UserRequestDTO("Vlad", "email@gmail.com", "password");
+        Mockito.when(userService.saveUser(Mockito.any(UserRequestDTO.class))).thenReturn(true);
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/signup")
-                        .param("username", user.getUsername())
-                        .param("email", user.getEmail())
-                        .param("password", user.getPassword()))
+                        .param("username", userRequestDTO.getUsername())
+                        .param("email", userRequestDTO.getEmail())
+                        .param("password", userRequestDTO.getPassword()))
                 .andReturn();
 
         Assertions.assertNotNull(result.getModelAndView());
         Assertions.assertEquals("registration-success", result.getModelAndView().getViewName());
-        Mockito.verify(userService, Mockito.times(1)).saveUser(Mockito.any(User.class));
+        Mockito.verify(userService, Mockito.times(1)).saveUser(Mockito.any(UserRequestDTO.class));
     }
 }

@@ -1,5 +1,6 @@
 package com.authserver.service;
 
+import com.authserver.dto.UserRequestDTO;
 import com.authserver.exceptions.UserExistException;
 import com.authserver.model.User;
 import com.authserver.repository.UserRepository;
@@ -14,7 +15,11 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public boolean saveUser(User user) {
+    public boolean saveUser(UserRequestDTO userRequestDTO) {
+        User user = new User(userRequestDTO.getUsername(),
+                userRequestDTO.getPassword(),
+                userRequestDTO.getEmail());
+
         if (userRepository.findByUsername(user.getUsername()) != null) {
             throw new UserExistException("User already exists!");
         }
