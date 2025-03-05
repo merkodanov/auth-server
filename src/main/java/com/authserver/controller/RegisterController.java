@@ -27,6 +27,6 @@ public class RegisterController {
     public String registerUser(@ModelAttribute UserRequestDTO userRequestDTO) {
         userService.saveUser(userRequestDTO);
 
-        return "registration-success";
+        return "redirect:/login";
     }
 }

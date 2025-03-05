@@ -74,7 +74,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize ->
                         authorize
-                                .requestMatchers("/register/**").permitAll()
+                                .requestMatchers("/signup/**").permitAll()
                                 .anyRequest().authenticated())
                 .formLogin(formLogin -> formLogin.loginPage("/login").permitAll());
         return http.build();

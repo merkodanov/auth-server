@@ -5,7 +5,7 @@
     <title>Registration page</title>
 </head>
 <body>
-<form method="post" th:action="@{/register}">
+<form method="post" th:action="@{/signup}">
     <fieldset>
         <legend>Регистрация:</legend>
 
@@ -17,6 +17,7 @@
 
         <label for="password">Пароль:</label>
         <input type="password" id="password" name="password" required>
+        <button type="submit">Отправить</button>
     </fieldset>
 </form>
 </body>
