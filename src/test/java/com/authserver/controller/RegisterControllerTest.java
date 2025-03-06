@@ -57,18 +57,20 @@ class RegisterControllerTest {
                 .andReturn();
 
         Assertions.assertNotNull(result.getModelAndView());
-        Assertions.assertEquals("registration-success", result.getModelAndView().getViewName());
+        Assertions.assertEquals("redirect:/login", result.getModelAndView().getViewName());
         Mockito.verify(userService, Mockito.times(1)).saveUser(Mockito.any(UserRequestDTO.class));
     }
 
     @Test
     void registerUser_fails_when_User_is_exists() throws Exception{
-        Mockito.when(userService.saveUser(userRequestDTO)).thenThrow(UserExistException.class);
+        UserExistException userExistException = Mockito.mock(UserExistException.class);
+        Mockito.when(userService.saveUser(userRequestDTO)).thenThrow(userExistException);
+        Mockito.when(userExistException.getMessage()).thenReturn("User exists");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/signup")
                 .param("username", userRequestDTO.getUsername())
                 .param("email", userRequestDTO.getEmail())
                 .param("password", userRequestDTO.getPassword()))
-                .andExpect(model().attribute("error","User is exists!"));
+                .andExpect(model().attribute("error", userExistException.getMessage()));
     }
 }
