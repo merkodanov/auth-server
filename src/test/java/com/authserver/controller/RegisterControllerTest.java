@@ -31,7 +31,7 @@ class RegisterControllerTest {
     private UserService userService;
 
     @BeforeEach
-    void initUser(){
+    void initUser() {
         userRequestDTO = new UserRequestDTO("Vladd",
                 "email@gmail.com",
                 "password");
@@ -62,15 +62,28 @@ class RegisterControllerTest {
     }
 
     @Test
-    void registerUser_fails_when_User_is_exists() throws Exception{
+    void registerUser_fails_when_User_is_exists() throws Exception {
         UserExistException userExistException = Mockito.mock(UserExistException.class);
         Mockito.when(userService.saveUser(userRequestDTO)).thenThrow(userExistException);
         Mockito.when(userExistException.getMessage()).thenReturn("User exists");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/signup")
-                .param("username", userRequestDTO.getUsername())
-                .param("email", userRequestDTO.getEmail())
-                .param("password", userRequestDTO.getPassword()))
-                .andExpect(model().attribute("error", userExistException.getMessage()));
+                        .param("username", userRequestDTO.getUsername())
+                        .param("email", userRequestDTO.getEmail())
+                        .param("password", userRequestDTO.getPassword()))
+                .andExpect(model().attribute("error", "Error caused by existing user: " + userExistException.getMessage()));
+    }
+
+    @Test
+    void registerUser_fails_when_fields_are_null() throws Exception {
+        IllegalArgumentException illegalArgumentException = Mockito.mock(IllegalArgumentException.class);
+        Mockito.when(userService.saveUser(userRequestDTO)).thenThrow(illegalArgumentException);
+        Mockito.when(illegalArgumentException.getMessage()).thenReturn("Illegal argument");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/signup")
+                        .param("username", userRequestDTO.getUsername())
+                        .param("email", userRequestDTO.getEmail())
+                        .param("password", userRequestDTO.getPassword()))
+                .andExpect(model().attribute("error", "Error caused by input: " + illegalArgumentException.getMessage()));
     }
 }

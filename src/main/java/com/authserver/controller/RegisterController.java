@@ -32,7 +32,10 @@ public class RegisterController {
             userService.saveUser(userRequestDTO);
             return "redirect:/login";
         } catch (UserExistException e) {
-            model.addAttribute("error", e.getMessage());
+            model.addAttribute("error", "Error caused by existing user: " + e.getMessage());
+            return "registration";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", "Error caused by input: " + e.getMessage());
             return "registration";
         }
     }

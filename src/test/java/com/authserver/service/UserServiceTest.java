@@ -42,22 +42,23 @@ class UserServiceTest {
                 userRequestDTO.getPassword(),
                 userRequestDTO.getEmail());
     }
-    static Stream<UserRequestDTO> userRequestDTOStream(){
+
+    static Stream<UserRequestDTO> userRequestDTOStream() {
         return Stream.of(
-                new UserRequestDTO("fill","fill", null),
-                new UserRequestDTO("fill",null,"fill"),
-                new UserRequestDTO(null,"fill","fill")
+                new UserRequestDTO("fill", "fill", null),
+                new UserRequestDTO("fill", null, "fill"),
+                new UserRequestDTO(null, "fill", "fill")
         );
     }
 
     @ParameterizedTest
     @MethodSource("userRequestDTOStream")
-    void saveUser_userRequestDTO_fields_are_null(UserRequestDTO userRequestDTO){
+    void saveUser_userRequestDTO_fields_are_null(UserRequestDTO userRequestDTO) {
         Assertions.assertThrows(IllegalArgumentException.class, () -> userService.saveUser(userRequestDTO));
     }
 
     @Test
-    void saveUser_userRequestDTO_is_null(){
+    void saveUser_userRequestDTO_is_null() {
         userRequestDTO = null;
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> userService.saveUser(userRequestDTO));
