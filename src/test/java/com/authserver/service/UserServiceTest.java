@@ -65,14 +65,14 @@ class UserServiceTest {
 
     @Test
     void saveUser_user_is_exists() {
-        Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(user);
+        Mockito.when(userRepository.findByEmail(Mockito.any(String.class))).thenReturn(user);
 
         Assertions.assertThrows(UserExistException.class, () -> userService.saveUser(userRequestDTO));
     }
 
     @Test
     void saveUser_is_success() {
-        Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(null);
+        Mockito.when(userRepository.findByEmail(Mockito.any(String.class))).thenReturn(null);
         Mockito.when(passwordEncoder.encode(Mockito.any(String.class))).thenReturn("ENCODED");
         Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(Mockito.any(User.class));
 

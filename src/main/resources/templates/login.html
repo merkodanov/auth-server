@@ -6,8 +6,9 @@
 </head>
 <body>
 <form method="post" th:action="@{/login}">
+<!--    Spring Security requires that field be "username"-->
     <input type="text" id="username" name="username" required autofocus>
-    <label for="username">Username</label>
+    <label for="username">Email</label>
     <input type="password" id="password" name="password" required>
     <label for="password">Password</label>
     <button type="submit">Send</button>

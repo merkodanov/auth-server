@@ -21,31 +21,42 @@ public class UserService {
     }
 
     public boolean saveUser(UserRequestDTO userRequestDTO) {
-        this.checkForNullUserRequestDTO(userRequestDTO);
+        checkUserRequestDTONotNull(userRequestDTO);
 
         User user = new User(userRequestDTO.getUsername(),
                 passwordEncoder.encode(userRequestDTO.getPassword()),
                 userRequestDTO.getEmail());
 
-        if (userRepository.findByUsername(user.getUsername()) != null) {
-            throw new UserExistException("User already exists!");
-        }
+        checkEmailIsUnique(user);
+        checkUsernameIsUnique(user);
         userRepository.save(user);
         return true;
     }
 
-    private void checkForNullUserRequestDTO(UserRequestDTO userRequestDTO){
+    private void checkUserRequestDTONotNull(UserRequestDTO userRequestDTO) {
         if (userRequestDTO == null) {
             throw new IllegalArgumentException("UserRequestDTO must be not null");
         }
-        if(Objects.isNull(userRequestDTO.getEmail())){
+        if (Objects.isNull(userRequestDTO.getEmail())) {
             throw new IllegalArgumentException("E-mail must be not null");
         }
-        if(Objects.isNull(userRequestDTO.getUsername())){
+        if (Objects.isNull(userRequestDTO.getUsername())) {
             throw new IllegalArgumentException("Username must be not null");
         }
-        if(Objects.isNull(userRequestDTO.getPassword())){
+        if (Objects.isNull(userRequestDTO.getPassword())) {
             throw new IllegalArgumentException("Password must be not null");
+        }
+    }
+
+    private void checkEmailIsUnique(User user) {
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            throw new UserExistException("Email already exists!");
+        }
+    }
+
+    private void checkUsernameIsUnique(User user) {
+        if (userRepository.findByUsername(user.getUsername()) != null) {
+            throw new UserExistException("Username already exists!");
         }
     }
 }

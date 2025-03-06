@@ -112,7 +112,7 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
-        return userRepository::findByUsername;
+        return userRepository::findByEmail;
     }
 
     @Bean
