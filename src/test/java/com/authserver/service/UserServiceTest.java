@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -25,6 +26,9 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @BeforeEach
     void initUser() {
         userRequestDTO = new UserRequestDTO("Vlad",
@@ -33,6 +37,7 @@ class UserServiceTest {
         user = new User(userRequestDTO.getUsername(),
                 userRequestDTO.getPassword(),
                 userRequestDTO.getEmail());
+        Mockito.when(passwordEncoder.encode(Mockito.any(String.class))).thenReturn("ENCODED");
     }
 
     @Test
@@ -45,7 +50,7 @@ class UserServiceTest {
     @Test
     void saveUser_is_success() {
         Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(null);
-        Mockito.when(userRepository.save(user)).thenReturn(user);
+        Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(Mockito.any(User.class));
 
         boolean result = userService.saveUser(userRequestDTO);
 
