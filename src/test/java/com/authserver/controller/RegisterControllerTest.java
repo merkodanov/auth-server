@@ -38,7 +38,7 @@ class RegisterControllerTest {
     }
 
     @Test
-    void getRegistrationForm_load_success() throws Exception {
+    void load_registration_form_is_success() throws Exception {
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/signup"))
                 .andReturn();
 
@@ -47,7 +47,7 @@ class RegisterControllerTest {
     }
 
     @Test
-    void registerUser_is_success() throws Exception {
+    void register_User_is_success() throws Exception {
         Mockito.when(userService.saveUser(Mockito.any(UserRequestDTO.class))).thenReturn(true);
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/signup")
@@ -62,7 +62,7 @@ class RegisterControllerTest {
     }
 
     @Test
-    void registerUser_fails_when_User_is_exists() throws Exception {
+    void register_User_fails_when_User_is_exists() throws Exception {
         UserExistException userExistException = Mockito.mock(UserExistException.class);
         Mockito.when(userService.saveUser(userRequestDTO)).thenThrow(userExistException);
         Mockito.when(userExistException.getMessage()).thenReturn("User exists");
@@ -75,7 +75,7 @@ class RegisterControllerTest {
     }
 
     @Test
-    void registerUser_fails_when_fields_are_null() throws Exception {
+    void register_User_fails_when_fields_are_null() throws Exception {
         IllegalArgumentException illegalArgumentException = Mockito.mock(IllegalArgumentException.class);
         Mockito.when(userService.saveUser(userRequestDTO)).thenThrow(illegalArgumentException);
         Mockito.when(illegalArgumentException.getMessage()).thenReturn("Illegal argument");
