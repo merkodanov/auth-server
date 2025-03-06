@@ -53,26 +53,26 @@ class UserServiceTest {
 
     @ParameterizedTest
     @MethodSource("userRequestDTOStream")
-    void saveUser_userRequestDTO_fields_are_null(UserRequestDTO userRequestDTO) {
+    void saving_user_when_UserRequestDTO_fields_are_null(UserRequestDTO userRequestDTO) {
         Assertions.assertThrows(IllegalArgumentException.class, () -> userService.saveUser(userRequestDTO));
     }
 
     @Test
-    void saveUser_userRequestDTO_is_null() {
+    void saving_user_when_UserRequestDTO_is_null() {
         userRequestDTO = null;
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> userService.saveUser(userRequestDTO));
     }
 
     @Test
-    void saveUser_user_is_exists() {
+    void saving_user_when_user_already_exists() {
         Mockito.when(userRepository.findByEmail(Mockito.any(String.class))).thenReturn(user);
 
         Assertions.assertThrows(UserExistException.class, () -> userService.saveUser(userRequestDTO));
     }
 
     @Test
-    void saveUser_is_success() {
+    void saving_user_is_success() {
         Mockito.when(userRepository.findByEmail(Mockito.any(String.class))).thenReturn(null);
         Mockito.when(passwordEncoder.encode(Mockito.any(String.class))).thenReturn("ENCODED");
         Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(Mockito.any(User.class));
@@ -80,5 +80,10 @@ class UserServiceTest {
         boolean result = userService.saveUser(userRequestDTO);
 
         Assertions.assertTrue(result);
+    }
+
+    @Test
+    void saving_user_without_at_in_email(){
+
     }
 }
