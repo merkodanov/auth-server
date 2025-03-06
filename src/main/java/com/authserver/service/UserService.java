@@ -7,6 +7,8 @@ import com.authserver.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 public class UserService {
 
@@ -19,9 +21,8 @@ public class UserService {
     }
 
     public boolean saveUser(UserRequestDTO userRequestDTO) {
-        if (userRequestDTO == null) {
-            throw new IllegalArgumentException("UserRequestDTO cannot be null");
-        }
+        this.checkForNullUserRequestDTO(userRequestDTO);
+
         User user = new User(userRequestDTO.getUsername(),
                 passwordEncoder.encode(userRequestDTO.getPassword()),
                 userRequestDTO.getEmail());
@@ -31,5 +32,20 @@ public class UserService {
         }
         userRepository.save(user);
         return true;
+    }
+
+    private void checkForNullUserRequestDTO(UserRequestDTO userRequestDTO){
+        if (userRequestDTO == null) {
+            throw new IllegalArgumentException("UserRequestDTO must be not null");
+        }
+        if(Objects.isNull(userRequestDTO.getEmail())){
+            throw new IllegalArgumentException("E-mail must be not null");
+        }
+        if(Objects.isNull(userRequestDTO.getUsername())){
+            throw new IllegalArgumentException("Username must be not null");
+        }
+        if(Objects.isNull(userRequestDTO.getPassword())){
+            throw new IllegalArgumentException("Password must be not null");
+        }
     }
 }

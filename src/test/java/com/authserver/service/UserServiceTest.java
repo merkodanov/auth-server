@@ -8,11 +8,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -37,6 +41,19 @@ class UserServiceTest {
         user = new User(userRequestDTO.getUsername(),
                 userRequestDTO.getPassword(),
                 userRequestDTO.getEmail());
+    }
+    static Stream<UserRequestDTO> userRequestDTOStream(){
+        return Stream.of(
+                new UserRequestDTO("fill","fill", null),
+                new UserRequestDTO("fill",null,"fill"),
+                new UserRequestDTO(null,"fill","fill")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("userRequestDTOStream")
+    void saveUser_userRequestDTO_fields_are_null(UserRequestDTO userRequestDTO){
+        Assertions.assertThrows(IllegalArgumentException.class, () -> userService.saveUser(userRequestDTO));
     }
 
     @Test
