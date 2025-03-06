@@ -19,6 +19,9 @@ public class UserService {
     }
 
     public boolean saveUser(UserRequestDTO userRequestDTO) {
+        if (userRequestDTO == null) {
+            throw new IllegalArgumentException("UserRequestDTO cannot be null");
+        }
         User user = new User(userRequestDTO.getUsername(),
                 passwordEncoder.encode(userRequestDTO.getPassword()),
                 userRequestDTO.getEmail());

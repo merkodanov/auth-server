@@ -37,7 +37,13 @@ class UserServiceTest {
         user = new User(userRequestDTO.getUsername(),
                 userRequestDTO.getPassword(),
                 userRequestDTO.getEmail());
-        Mockito.when(passwordEncoder.encode(Mockito.any(String.class))).thenReturn("ENCODED");
+    }
+
+    @Test
+    void saveUser_userRequestDTO_is_null(){
+        userRequestDTO = null;
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> userService.saveUser(userRequestDTO));
     }
 
     @Test
@@ -50,6 +56,7 @@ class UserServiceTest {
     @Test
     void saveUser_is_success() {
         Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(null);
+        Mockito.when(passwordEncoder.encode(Mockito.any(String.class))).thenReturn("ENCODED");
         Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(Mockito.any(User.class));
 
         boolean result = userService.saveUser(userRequestDTO);
