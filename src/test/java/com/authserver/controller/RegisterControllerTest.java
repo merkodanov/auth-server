@@ -6,6 +6,8 @@ import com.authserver.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,6 +16,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.stream.Stream;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
@@ -32,9 +36,17 @@ class RegisterControllerTest {
 
     @BeforeEach
     void initUser() {
-        userRequestDTO = new UserRequestDTO("Vladd",
+        userRequestDTO = new UserRequestDTO("Vladek",
                 "email@gmail.com",
                 "password");
+    }
+
+    static Stream<UserRequestDTO> userRequestDTOStream() {
+        return Stream.of(
+                new UserRequestDTO("fill", "fill", null),
+                new UserRequestDTO("fill", null, "fill"),
+                new UserRequestDTO(null, "fill", "fill")
+        );
     }
 
     @Test
@@ -85,5 +97,35 @@ class RegisterControllerTest {
                         .param("email", userRequestDTO.getEmail())
                         .param("password", userRequestDTO.getPassword()))
                 .andExpect(model().attribute("error", "Error caused by input: " + illegalArgumentException.getMessage()));
+    }
+
+    @Test
+    void saving_user_when_UserRequestDTO_is_null() throws Exception {
+        userRequestDTO = null;
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/signup"))
+                .andExpect(model().attributeExists("error"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("userRequestDTOStream")
+    void saving_user_when_UserRequestDTO_fields_are_null(UserRequestDTO userRequestDTO) throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/signup")
+                        .param("username", userRequestDTO.getUsername())
+                        .param("email", userRequestDTO.getEmail())
+                        .param("password", userRequestDTO.getPassword()))
+                .andExpect(model().attributeExists("error"));
+    }
+
+    @Test
+    void saving_user_with_invalid_email() throws Exception {
+        UserRequestDTO userRequestDTO = new UserRequestDTO("Vlad",
+                "email.com", "123");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/signup")
+                        .param("username", userRequestDTO.getUsername())
+                        .param("email", userRequestDTO.getEmail())
+                        .param("password", userRequestDTO.getPassword()))
+                .andExpect(model().attributeExists("error"));
     }
 }
