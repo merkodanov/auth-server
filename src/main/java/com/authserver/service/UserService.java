@@ -1,6 +1,7 @@
 package com.authserver.service;
 
 import com.authserver.dto.UserRequestDTO;
+import com.authserver.exceptions.InvalidEmailException;
 import com.authserver.exceptions.UserExistException;
 import com.authserver.model.User;
 import com.authserver.repository.UserRepository;
@@ -22,7 +23,7 @@ public class UserService {
 
     public boolean saveUser(UserRequestDTO userRequestDTO) {
         checkUserRequestDTONotNull(userRequestDTO);
-
+        checkAtInEmail(userRequestDTO.getEmail());
         User user = new User(userRequestDTO.getUsername(),
                 passwordEncoder.encode(userRequestDTO.getPassword()),
                 userRequestDTO.getEmail());
@@ -59,4 +60,16 @@ public class UserService {
             throw new UserExistException("Username already exists!");
         }
     }
+
+    private void checkAtInEmail(String email) {
+        if (!email.contains("@") || email.indexOf("@") != email.lastIndexOf("@")) {
+            throw new InvalidEmailException("E-mail invalid");
+        }
+        int indexOfAt = email.indexOf("@");
+        String emailAfterAt = email.substring(indexOfAt);
+        if (!emailAfterAt.contains(".") || emailAfterAt.indexOf(".") != emailAfterAt.lastIndexOf(".")){
+            throw new InvalidEmailException("E-mail invalid");
+        }
+    }
+
 }

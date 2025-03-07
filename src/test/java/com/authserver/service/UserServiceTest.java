@@ -1,6 +1,7 @@
 package com.authserver.service;
 
 import com.authserver.dto.UserRequestDTO;
+import com.authserver.exceptions.InvalidEmailException;
 import com.authserver.exceptions.UserExistException;
 import com.authserver.model.User;
 import com.authserver.repository.UserRepository;
@@ -83,7 +84,10 @@ class UserServiceTest {
     }
 
     @Test
-    void saving_user_without_at_in_email(){
+    void saving_user_with_invalid_email(){
+        UserRequestDTO userRequestDTO = new UserRequestDTO("Vlad",
+                "email.com","123");
 
+        Assertions.assertThrows(InvalidEmailException.class, () -> userService.saveUser(userRequestDTO));
     }
 }
