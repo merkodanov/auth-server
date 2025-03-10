@@ -1,5 +1,7 @@
 package com.authserver.model;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -13,6 +15,7 @@ import org.springframework.security.oauth2.server.authorization.settings.OAuth2T
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Set;
 
 @RedisHash("oauth2_registered_client")
@@ -25,6 +28,7 @@ public class OAuth2RegisteredClient {
     private final String clientId;
     private final Instant clientIdIssuedAt;
     private final String clientSecret;
+    private final Instant clientSecretExpiresAt;
     private final String clientName;
     private final Set<ClientAuthenticationMethod> clientAuthenticationMethods;
     private final Set<AuthorizationGrantType> authorizationGrantTypes;
@@ -34,6 +38,7 @@ public class OAuth2RegisteredClient {
     private final ClientSettings clientSettings;
     private final TokenSettings tokenSettings;
 
+    @Getter
     public static class ClientSettings {
 
         private final boolean requireProofKey;
@@ -55,28 +60,29 @@ public class OAuth2RegisteredClient {
             this.x509CertificateSubjectDN = x509CertificateSubjectDN;
         }
 
-        public boolean isRequireProofKey() {
-            return this.requireProofKey;
+        public static ClientSettings fromMap(Map<String, Object> settings) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                return objectMapper.convertValue(settings, new TypeReference<>() {
+                });
+            } catch (Exception ex) {
+                throw new IllegalArgumentException(ex.getMessage(), ex);
+            }
         }
 
-        public boolean isRequireAuthorizationConsent() {
-            return this.requireAuthorizationConsent;
+        public Map<String, Object> toMap() {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                return objectMapper.convertValue(this, new TypeReference<>() {
+                });
+            }
+            catch (Exception ex){
+                throw new IllegalArgumentException(ex.getMessage(), ex);
+            }
         }
-
-        public String getJwkSetUrl() {
-            return this.jwkSetUrl;
-        }
-
-        public JwsAlgorithm getTokenEndpointAuthenticationSigningAlgorithm() {
-            return this.tokenEndpointAuthenticationSigningAlgorithm;
-        }
-
-        public String getX509CertificateSubjectDN() {
-            return this.x509CertificateSubjectDN;
-        }
-
     }
 
+    @Getter
     public static class TokenSettings {
 
         private final Duration authorizationCodeTimeToLive;
@@ -109,36 +115,25 @@ public class OAuth2RegisteredClient {
             this.x509CertificateBoundAccessTokens = x509CertificateBoundAccessTokens;
         }
 
-        public Duration getAuthorizationCodeTimeToLive() {
-            return this.authorizationCodeTimeToLive;
+        public static TokenSettings fromMap(Map<String, Object> settings){
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                return objectMapper.convertValue(settings, new TypeReference<>() {
+                });
+            } catch (Exception ex) {
+                throw new IllegalArgumentException(ex.getMessage(), ex);
+            }
         }
 
-        public Duration getAccessTokenTimeToLive() {
-            return this.accessTokenTimeToLive;
-        }
-
-        public OAuth2TokenFormat getAccessTokenFormat() {
-            return this.accessTokenFormat;
-        }
-
-        public Duration getDeviceCodeTimeToLive() {
-            return this.deviceCodeTimeToLive;
-        }
-
-        public boolean isReuseRefreshTokens() {
-            return this.reuseRefreshTokens;
-        }
-
-        public Duration getRefreshTokenTimeToLive() {
-            return this.refreshTokenTimeToLive;
-        }
-
-        public SignatureAlgorithm getIdTokenSignatureAlgorithm() {
-            return this.idTokenSignatureAlgorithm;
-        }
-
-        public boolean isX509CertificateBoundAccessTokens() {
-            return this.x509CertificateBoundAccessTokens;
+        public Map<String, Object> toMap() {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                return objectMapper.convertValue(this, new TypeReference<>() {
+                });
+            }
+            catch (Exception ex){
+                throw new IllegalArgumentException(ex.getMessage(), ex);
+            }
         }
 
     }
