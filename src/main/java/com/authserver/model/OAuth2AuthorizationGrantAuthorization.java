@@ -1,15 +1,19 @@
 package com.authserver.model;
 
+import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
 
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 
+@Getter
 @RedisHash("oauth2_authorization")
 public abstract class OAuth2AuthorizationGrantAuthorization {
 
@@ -26,41 +30,22 @@ public abstract class OAuth2AuthorizationGrantAuthorization {
 
     private final RefreshToken refreshToken;
 
+    private final AuthorizationGrantType authorizationGrantType;
+
     protected OAuth2AuthorizationGrantAuthorization(String id, String registeredClientId, String principalName,
-                                                    Set<String> authorizedScopes, AccessToken accessToken, RefreshToken refreshToken) {
+                                                    Set<String> authorizedScopes, AccessToken accessToken,
+                                                    RefreshToken refreshToken, AuthorizationGrantType authorizationGrantType) {
         this.id = id;
         this.registeredClientId = registeredClientId;
         this.principalName = principalName;
         this.authorizedScopes = authorizedScopes;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
+        this.authorizationGrantType = authorizationGrantType;
     }
 
-    public String getId() {
-        return this.id;
-    }
-
-    public String getRegisteredClientId() {
-        return this.registeredClientId;
-    }
-
-    public String getPrincipalName() {
-        return this.principalName;
-    }
-
-    public Set<String> getAuthorizedScopes() {
-        return this.authorizedScopes;
-    }
-
-    public AccessToken getAccessToken() {
-        return this.accessToken;
-    }
-
-    public RefreshToken getRefreshToken() {
-        return this.refreshToken;
-    }
-
-    protected abstract static class AbstractToken {
+    @Getter
+    protected abstract static class AbstractToken implements OAuth2Token {
 
         @Indexed
         private final String tokenValue;
@@ -78,24 +63,9 @@ public abstract class OAuth2AuthorizationGrantAuthorization {
             this.invalidated = invalidated;
         }
 
-        public String getTokenValue() {
-            return this.tokenValue;
-        }
-
-        public Instant getIssuedAt() {
-            return this.issuedAt;
-        }
-
-        public Instant getExpiresAt() {
-            return this.expiresAt;
-        }
-
-        public boolean isInvalidated() {
-            return this.invalidated;
-        }
-
     }
 
+    @Getter
     public static class ClaimsHolder {
 
         private final Map<String, Object> claims;
@@ -104,12 +74,9 @@ public abstract class OAuth2AuthorizationGrantAuthorization {
             this.claims = claims;
         }
 
-        public Map<String, Object> getClaims() {
-            return this.claims;
-        }
-
     }
 
+    @Getter
     public static class AccessToken extends AbstractToken {
 
         private final OAuth2AccessToken.TokenType tokenType;
@@ -128,22 +95,6 @@ public abstract class OAuth2AuthorizationGrantAuthorization {
             this.scopes = scopes;
             this.tokenFormat = tokenFormat;
             this.claims = claims;
-        }
-
-        public OAuth2AccessToken.TokenType getTokenType() {
-            return this.tokenType;
-        }
-
-        public Set<String> getScopes() {
-            return this.scopes;
-        }
-
-        public OAuth2TokenFormat getTokenFormat() {
-            return this.tokenFormat;
-        }
-
-        public ClaimsHolder getClaims() {
-            return this.claims;
         }
 
     }
