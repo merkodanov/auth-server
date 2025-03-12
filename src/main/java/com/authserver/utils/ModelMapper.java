@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
@@ -103,6 +104,9 @@ public class ModelMapper {
                 oAuth2AuthorizationCodeGrantAuthorization) {
             if (oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationCode() != null) {
                 oAuth2AuthorizationBuilder.token(oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationCode());
+            }
+            if (oAuth2AuthorizationCodeGrantAuthorization.getState() != null) {
+                oAuth2AuthorizationBuilder.attribute(OAuth2ParameterNames.STATE, oAuth2AuthorizationCodeGrantAuthorization.getState());
             }
         }
 
