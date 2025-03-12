@@ -88,10 +88,10 @@ public class ModelMapper {
                 idToken);
     }
 
-    public static OAuth2Authorization.Builder convertOAuth2AuthorizationGrantAuthorizationToOAuth2Authorization(OAuth2AuthorizationGrantAuthorization
-                                                                                                                        authorizationGrantAuthorization,
-                                                                                                                OAuth2Authorization.Builder
-                                                                                                                        oAuth2AuthorizationBuilder) {
+    public static void convertOAuth2AuthorizationGrantAuthorizationToOAuth2Authorization(OAuth2AuthorizationGrantAuthorization
+                                                                                                 authorizationGrantAuthorization,
+                                                                                         OAuth2Authorization.Builder
+                                                                                                 oAuth2AuthorizationBuilder) {
         oAuth2AuthorizationBuilder
                 .id(authorizationGrantAuthorization.getId())
                 .principalName(authorizationGrantAuthorization.getPrincipalName())
@@ -112,7 +112,6 @@ public class ModelMapper {
                 oAuth2AuthorizationBuilder.token(oidcAuthorizationCodeGrantAuthorization.getIdToken());
             }
         }
-        return oAuth2AuthorizationBuilder;
     }
 
     private static AuthorizationGrantType resolveAuthorizationGrantType(String authorizationGrantType) {
