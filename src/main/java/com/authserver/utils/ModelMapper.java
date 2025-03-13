@@ -14,13 +14,47 @@ import org.springframework.security.oauth2.server.authorization.settings.OAuth2T
 
 import java.util.Objects;
 
-
 public class ModelMapper {
+    // Аттрибуты
+    //{"@class":"java.util.Collections$UnmodifiableMap",
+    // "org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest":
+    // {"@class":"org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest",
+    // "authorizationUri":"http://authserver:9000/oauth2/authorize",
+    // "authorizationGrantType":{"value":"authorization_code"},
+    // "responseType":{"value":"code"},
+    // "clientId":"todolist",
+    // "redirectUri":"http://127.0.0.1:9090/login/oauth2/code/todolist-client",
+    // "scopes":["java.util.Collections$UnmodifiableSet",["readTask","updateTask","openid","profile","deleteTask","addTask"]],
+    // "state":"x-qgYcev42KdfwEQYCrW_m2TBm1kNvMLON7yr-68TUk=",
+    // "additionalParameters":{"@class":"java.util.Collections$UnmodifiableMap","nonce":"NdR0Ae6W0ORP1LQyptEz-sSYMRcOd0zd_PdMK-k7ASg"},
+    // "authorizationRequestUri":"http://authserver:9000/oauth2/authorize?response_type=code&client_id=todolist&scope=readTask%20updateTask%20openid%20profile%20deleteTask%20addTask&state=x-qgYcev42KdfwEQYCrW_m2TBm1kNvMLON7yr-68TUk%3D&redirect_uri=http://127.0.0.1:9090/login/oauth2/code/todolist-client&nonce=NdR0Ae6W0ORP1LQyptEz-sSYMRcOd0zd_PdMK-k7ASg",
+    // "attributes":{"@class":"java.util.Collections$UnmodifiableMap"}},
+
+    // "java.security.Principal":{
+    // "@class":"org.springframework.security.authentication.UsernamePasswordAuthenticationToken",
+    // "authorities":["java.util.Collections$UnmodifiableRandomAccessList",[{"@class":"org.springframework.security.core.authority.SimpleGrantedAuthority","authority":"ROLE_USER"}]],
+    // "details":{"@class":"org.springframework.security.web.authentication.WebAuthenticationDetails",
+    // "remoteAddress":"127.0.0.1",
+    // "sessionId":"11F188BC4AA4529E4C937C527C91AD8E"},
+    // "authenticated":true,
+    // "principal":
+    // {"@class":"com.authserver.model.User",
+    // "id":0,
+    // "username":"Vova",
+    // "password":"$2a$10$jqhddbeAb2xUGuRt.GmfFOed5E8n.NZkjo5FMt5OXUmicnyBCt90m",
+    // "email":"vladislavik259@gmail.com",
+    // "role":"ROLE_USER",
+    // "enabled":true,
+    // "authorities":["java.util.ImmutableCollections$List12",
+    // [{"@class":"org.springframework.security.core.authority.SimpleGrantedAuthority","authority":"ROLE_USER"}]],
+    // "accountNonLocked":true,
+    // "accountNonExpired":true,"credentialsNonExpired":true},
+    // "credentials":null}}
 
     //TODO Добавить аттрибуты и метадату!!!
     public static OAuth2AuthorizationGrantAuthorization convertOAuth2AuthorizationToOidcGrant(OAuth2Authorization authorization) {
 
-        OAuth2AuthorizationRequest oAuth2AuthorizationRequest = authorization.getAttribute("OAuth2AuthorizationRequest");
+        OAuth2AuthorizationRequest oAuth2AuthorizationRequest = authorization.getAttribute("authorizationRequest");
         Objects.requireNonNull(oAuth2AuthorizationRequest, "Authorization Request is null");
 
         OidcAuthorizationCodeGrantAuthorization.IdToken idToken = getOidcTokenForEntity(authorization);
@@ -34,7 +68,7 @@ public class ModelMapper {
         return new OidcAuthorizationCodeGrantAuthorization(
                 authorization.getId(), authorization.getRegisteredClientId(), authorization.getPrincipalName(),
                 authorization.getAuthorizedScopes(), accessToken, refreshToken,
-                authorization.getAttribute("java.security.Principal"), authorization.getAuthorizationGrantType(),
+                authorization.getAttribute("principal"), authorization.getAuthorizationGrantType(),
                 oAuth2AuthorizationRequest, authorizationCode, oAuth2AuthorizationRequest.getState(),
                 idToken);
     }
@@ -49,7 +83,7 @@ public class ModelMapper {
                 .principalName(authorizationGrantAuthorization.getPrincipalName())
                 .authorizationGrantType(authorizationGrantAuthorization.getAuthorizationGrantType())
                 .token(authorizationGrantAuthorization.getAccessToken())
-                .authorizedScopes(authorizationGrantAuthorization.getAccessToken())
+                .authorizedScopes(authorizationGrantAuthorization.getAccessToken().getScopes())
                 .token(authorizationGrantAuthorization.getRefreshToken());
 
         if (authorizationGrantAuthorization instanceof OAuth2AuthorizationCodeGrantAuthorization
@@ -57,8 +91,11 @@ public class ModelMapper {
             if (oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationCode() != null) {
                 oAuth2AuthorizationBuilder.token(oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationCode());
             }
-            if (oAuth2AuthorizationCodeGrantAuthorization.getState() != null) {
-                oAuth2AuthorizationBuilder.attribute(OAuth2ParameterNames.STATE, oAuth2AuthorizationCodeGrantAuthorization.getState());
+            if (oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationRequest() != null){
+                oAuth2AuthorizationBuilder.attribute("authorizationRequest", oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationRequest());
+            }
+            if (oAuth2AuthorizationCodeGrantAuthorization.getPrincipal() != null){
+                oAuth2AuthorizationBuilder.attribute("principal", oAuth2AuthorizationCodeGrantAuthorization.getPrincipal());
             }
         }
 
