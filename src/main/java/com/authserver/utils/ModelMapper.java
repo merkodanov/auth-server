@@ -51,7 +51,8 @@ public class ModelMapper {
                     accessTokenMetadata.put(String.valueOf(OAuth2TokenFormat.class), OAuth2TokenFormat.SELF_CONTAINED);
                 })
                 .authorizedScopes(authorizationGrantAuthorization.getAccessToken().getScopes())
-                .token(authorizationGrantAuthorization.getRefreshToken());
+                .token(authorizationGrantAuthorization.getRefreshToken(), refreshTokenMetadata ->
+                        refreshTokenMetadata.put(OAuth2Authorization.Token.INVALIDATED_METADATA_NAME, false));
 
         if (authorizationGrantAuthorization instanceof OAuth2AuthorizationCodeGrantAuthorization
                 oAuth2AuthorizationCodeGrantAuthorization) {
@@ -69,7 +70,11 @@ public class ModelMapper {
         if (authorizationGrantAuthorization instanceof OidcAuthorizationCodeGrantAuthorization
                 oidcAuthorizationCodeGrantAuthorization) {
             if (oidcAuthorizationCodeGrantAuthorization.getIdToken() != null) {
-                oAuth2AuthorizationBuilder.token(oidcAuthorizationCodeGrantAuthorization.getIdToken());
+                oAuth2AuthorizationBuilder.token(oidcAuthorizationCodeGrantAuthorization.getIdToken(), oidcTokenMetadata ->
+                {
+                    oidcTokenMetadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME, oidcAuthorizationCodeGrantAuthorization.getIdToken().getClaims());
+                    oidcTokenMetadata.put(OAuth2Authorization.Token.INVALIDATED_METADATA_NAME, false);
+                });
             }
         }
     }
@@ -77,7 +82,7 @@ public class ModelMapper {
     private static OidcAuthorizationCodeGrantAuthorization.IdToken getOidcTokenForEntity(OAuth2Authorization authorization) {
         OAuth2Authorization.Token<OidcIdToken> oidcIdToken = authorization.getToken(OidcIdToken.class);
         OAuth2AuthorizationGrantAuthorization.ClaimsHolder claimsHolder = new OAuth2AuthorizationGrantAuthorization.ClaimsHolder(
-                Objects.requireNonNull(oidcIdToken, "OIDC TOKEN IS NULL").getToken().getClaims());
+                Objects.requireNonNull(oidcIdToken, "OIDC TOKEN IS NULL").getClaims());
         return new OidcAuthorizationCodeGrantAuthorization.IdToken(oidcIdToken.getToken().getTokenValue(),
                 oidcIdToken.getToken().getIssuedAt(), oidcIdToken.getToken().getExpiresAt(), oidcIdToken.isInvalidated(), claimsHolder);
     }
