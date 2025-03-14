@@ -12,4 +12,6 @@ public interface OAuth2AuthorizationGrantAuthorizationRepository
 
     OAuth2AuthorizationGrantAuthorization findByRefreshTokenTokenValue(String refreshToken);
 
+    OAuth2AuthorizationGrantAuthorization findByAccessTokenTokenValueOrRefreshTokenTokenValue(String accessToken, String refreshToken);
+
 }

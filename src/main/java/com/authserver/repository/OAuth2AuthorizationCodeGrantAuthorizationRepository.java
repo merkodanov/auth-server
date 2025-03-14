@@ -10,4 +10,6 @@ public interface OAuth2AuthorizationCodeGrantAuthorizationRepository
     OAuth2AuthorizationCodeGrantAuthorization findByAuthorizationCodeTokenValue(String authorizationCode);
 
     OAuth2AuthorizationCodeGrantAuthorization findByState(String state);
+
+    OAuth2AuthorizationCodeGrantAuthorization findByAuthorizationCodeTokenValueOrState(String authorizationCode, String state);
 }

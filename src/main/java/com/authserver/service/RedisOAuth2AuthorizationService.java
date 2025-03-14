@@ -48,7 +48,6 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
     @Override
     public void save(OAuth2Authorization authorization) {
         Assert.notNull(authorization, "authorization cannot be null");
-        // OIDC 
         OAuth2AuthorizationGrantAuthorization authorizationGrantAuthorization = ModelMapper
                 .convertOAuth2AuthorizationToOidcGrant(authorization);
         this.authorizationGrantAuthorizationRepository.save(authorizationGrantAuthorization);
@@ -75,15 +74,13 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
         Assert.hasText(token, "token cannot be empty");
         OAuth2AuthorizationGrantAuthorization authorizationGrantAuthorization = null;
         if (tokenType == null) {
-            authorizationGrantAuthorization = this.authorizationGrantAuthorizationRepository
-                    .findByStateOrAuthorizationCode(token, token);
+            authorizationGrantAuthorization = this.authorizationGrantAuthorizationRepository.findByAccessTokenTokenValueOrRefreshTokenTokenValue(
+                    token, token);
             if (authorizationGrantAuthorization == null) {
-                authorizationGrantAuthorization = this.authorizationGrantAuthorizationRepository
-                        .findByAccessTokenOrRefreshToken(token, token);
+                authorizationGrantAuthorization = this.oidcAuthorizationCodeGrantAuthorizationRepository.findByIdTokenTokenValue(token);
             }
             if (authorizationGrantAuthorization == null) {
-                authorizationGrantAuthorization = this.authorizationGrantAuthorizationRepository
-                        .findByIdToken(token);
+                authorizationGrantAuthorization = this.authorizationCodeGrantAuthorizationRepository.findByAuthorizationCodeTokenValueOrState(token, token);
             }
         } else if (OAuth2TokenType.ACCESS_TOKEN.equals(tokenType)) {
             authorizationGrantAuthorization = this.authorizationGrantAuthorizationRepository
@@ -96,6 +93,8 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
         } else if (OAuth2TokenType.REFRESH_TOKEN.equals(tokenType)) {
             authorizationGrantAuthorization = this.authorizationGrantAuthorizationRepository
                     .findByRefreshTokenTokenValue(token);
+        } else if (OAuth2ParameterNames.STATE.equals(tokenType.getValue())){
+            authorizationGrantAuthorization = this.authorizationCodeGrantAuthorizationRepository.findByState(token);
         }
         return authorizationGrantAuthorization != null ? toOAuth2Authorization(authorizationGrantAuthorization) : null;
     }
