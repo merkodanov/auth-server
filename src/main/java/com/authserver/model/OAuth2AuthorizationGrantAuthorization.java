@@ -6,9 +6,9 @@ import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +45,7 @@ public abstract class OAuth2AuthorizationGrantAuthorization {
     }
 
     @Getter
-    protected abstract static class AbstractToken implements OAuth2Token {
+    protected abstract static class AbstractToken {
 
         @Indexed
         private final String tokenValue;
@@ -66,7 +66,7 @@ public abstract class OAuth2AuthorizationGrantAuthorization {
     }
 
     @Getter
-    public static class ClaimsHolder {
+    public static class ClaimsHolder implements Serializable {
 
         private final Map<String, Object> claims;
 
