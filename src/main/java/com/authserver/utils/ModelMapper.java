@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
@@ -33,7 +34,7 @@ public class ModelMapper {
                 authorization.getId(), authorization.getRegisteredClientId(), authorization.getPrincipalName(),
                 authorization.getAuthorizedScopes(), accessToken, refreshToken,
                 authorization.getAttribute("java.security.Principal"), authorization.getAuthorizationGrantType(),
-                oAuth2AuthorizationRequest, authorizationCode, oAuth2AuthorizationRequest.getState(),
+                oAuth2AuthorizationRequest, authorizationCode, authorization.getAttribute(OAuth2ParameterNames.STATE),
                 idToken);
     }
 
@@ -82,6 +83,9 @@ public class ModelMapper {
             }
             if (oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationRequest() != null) {
                 oAuth2AuthorizationBuilder.attribute("org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest", oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationRequest());
+                if (oAuth2AuthorizationCodeGrantAuthorization.getState() != null) {
+                    oAuth2AuthorizationBuilder.attribute(OAuth2ParameterNames.STATE, oAuth2AuthorizationCodeGrantAuthorization.getState());
+                }
             }
             if (oAuth2AuthorizationCodeGrantAuthorization.getPrincipal() != null) {
                 oAuth2AuthorizationBuilder.attribute("java.security.Principal", oAuth2AuthorizationCodeGrantAuthorization.getPrincipal());

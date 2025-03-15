@@ -8,8 +8,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/auth_server
   data:
     redis:
-      host: 127.0.0.1
+      host: localhost
       port: 6379
 server:
   port: 9000
-debug: true
