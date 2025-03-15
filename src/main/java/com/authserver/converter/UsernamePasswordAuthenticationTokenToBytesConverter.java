@@ -11,12 +11,12 @@ import java.io.ObjectOutputStream;
 public class UsernamePasswordAuthenticationTokenToBytesConverter implements Converter<UsernamePasswordAuthenticationToken, byte[]> {
     @Override
     public byte[] convert(@Nullable UsernamePasswordAuthenticationToken source) {
-        try(ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(bos)){
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+             ObjectOutputStream oos = new ObjectOutputStream(bos)) {
             oos.writeObject(source);
             return bos.toByteArray();
         } catch (IOException e) {
-            throw new RuntimeException("Ошибка сериализации" + e.getMessage(),e);
+            throw new RuntimeException("Ошибка сериализации" + e.getMessage(), e);
         }
     }
 }
