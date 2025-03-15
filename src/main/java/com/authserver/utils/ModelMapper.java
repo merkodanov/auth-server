@@ -5,6 +5,7 @@ import com.authserver.model.OAuth2AuthorizationGrantAuthorization;
 import com.authserver.model.OidcAuthorizationCodeGrantAuthorization;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
+import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
@@ -44,20 +45,40 @@ public class ModelMapper {
                 .id(authorizationGrantAuthorization.getId())
                 .principalName(authorizationGrantAuthorization.getPrincipalName())
                 .authorizationGrantType(authorizationGrantAuthorization.getAuthorizationGrantType())
-                .token(authorizationGrantAuthorization.getAccessToken(), accessTokenMetadata ->
-                {
-                    accessTokenMetadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME, authorizationGrantAuthorization.getAccessToken().getClaims());
-                    accessTokenMetadata.put(OAuth2Authorization.Token.INVALIDATED_METADATA_NAME, false);
-                    accessTokenMetadata.put(String.valueOf(OAuth2TokenFormat.class), OAuth2TokenFormat.SELF_CONTAINED);
-                })
-                .authorizedScopes(authorizationGrantAuthorization.getAccessToken().getScopes())
-                .token(authorizationGrantAuthorization.getRefreshToken(), refreshTokenMetadata ->
-                        refreshTokenMetadata.put(OAuth2Authorization.Token.INVALIDATED_METADATA_NAME, false));
+                .authorizedScopes(authorizationGrantAuthorization.getAuthorizedScopes());
+
+        if (authorizationGrantAuthorization.getAccessToken() != null) {
+            OAuth2Token oAuth2Token = new OAuth2AccessToken(authorizationGrantAuthorization.getAccessToken().getTokenType(),
+                    authorizationGrantAuthorization.getAccessToken().getTokenValue(),
+                    authorizationGrantAuthorization.getAccessToken().getIssuedAt(),
+                    authorizationGrantAuthorization.getAccessToken().getExpiresAt(),
+                    authorizationGrantAuthorization.getAccessToken().getScopes());
+
+            oAuth2AuthorizationBuilder.token(oAuth2Token, accessTokenMetadata ->
+            {
+                accessTokenMetadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME, authorizationGrantAuthorization.getAccessToken().getClaims().getClaims());
+                accessTokenMetadata.put(OAuth2Authorization.Token.INVALIDATED_METADATA_NAME, false);
+                accessTokenMetadata.put(String.valueOf(OAuth2TokenFormat.class), OAuth2TokenFormat.SELF_CONTAINED);
+            });
+        }
+
+        if (authorizationGrantAuthorization.getRefreshToken() != null) {
+            OAuth2Token oAuth2Token = new OAuth2RefreshToken(authorizationGrantAuthorization.getRefreshToken().getTokenValue(),
+                    authorizationGrantAuthorization.getRefreshToken().getIssuedAt(),
+                    authorizationGrantAuthorization.getRefreshToken().getExpiresAt());
+
+            oAuth2AuthorizationBuilder.token(oAuth2Token, refreshTokenMetadata ->
+                    refreshTokenMetadata.put(OAuth2Authorization.Token.INVALIDATED_METADATA_NAME, false));
+        }
 
         if (authorizationGrantAuthorization instanceof OAuth2AuthorizationCodeGrantAuthorization
                 oAuth2AuthorizationCodeGrantAuthorization) {
             if (oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationCode() != null) {
-                oAuth2AuthorizationBuilder.token(oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationCode());
+                OAuth2Token oAuth2Token = new OAuth2AuthorizationCode(oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationCode().getTokenValue(),
+                        oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationCode().getIssuedAt(),
+                        oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationCode().getExpiresAt());
+
+                oAuth2AuthorizationBuilder.token(oAuth2Token);
             }
             if (oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationRequest() != null) {
                 oAuth2AuthorizationBuilder.attribute("org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest", oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationRequest());
@@ -70,9 +91,14 @@ public class ModelMapper {
         if (authorizationGrantAuthorization instanceof OidcAuthorizationCodeGrantAuthorization
                 oidcAuthorizationCodeGrantAuthorization) {
             if (oidcAuthorizationCodeGrantAuthorization.getIdToken() != null) {
-                oAuth2AuthorizationBuilder.token(oidcAuthorizationCodeGrantAuthorization.getIdToken(), oidcTokenMetadata ->
+                OAuth2Token oAuth2Token = new OidcIdToken(oidcAuthorizationCodeGrantAuthorization.getIdToken().getTokenValue(),
+                        oidcAuthorizationCodeGrantAuthorization.getIdToken().getIssuedAt(),
+                        oidcAuthorizationCodeGrantAuthorization.getIdToken().getExpiresAt(),
+                        oidcAuthorizationCodeGrantAuthorization.getIdToken().getClaims().getClaims());
+
+                oAuth2AuthorizationBuilder.token(oAuth2Token, oidcTokenMetadata ->
                 {
-                    oidcTokenMetadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME, oidcAuthorizationCodeGrantAuthorization.getIdToken().getClaims());
+                    oidcTokenMetadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME, oidcAuthorizationCodeGrantAuthorization.getIdToken().getClaims().getClaims());
                     oidcTokenMetadata.put(OAuth2Authorization.Token.INVALIDATED_METADATA_NAME, false);
                 });
             }
@@ -81,7 +107,7 @@ public class ModelMapper {
 
     private static OidcAuthorizationCodeGrantAuthorization.IdToken getOidcTokenForEntity(OAuth2Authorization authorization) {
         OAuth2Authorization.Token<OidcIdToken> oidcIdToken = authorization.getToken(OidcIdToken.class);
-        if (oidcIdToken == null){
+        if (oidcIdToken == null) {
             return null;
         }
         OAuth2AuthorizationGrantAuthorization.ClaimsHolder claimsHolder = new OAuth2AuthorizationGrantAuthorization.ClaimsHolder(
@@ -92,7 +118,7 @@ public class ModelMapper {
 
     private static OAuth2AuthorizationCodeGrantAuthorization.AuthorizationCode getAuthorizationCodeForEntity(OAuth2Authorization authorization) {
         OAuth2Authorization.Token<OAuth2AuthorizationCode> oAuth2AuthorizationCodeToken = authorization.getToken(OAuth2AuthorizationCode.class);
-        if (oAuth2AuthorizationCodeToken == null){
+        if (oAuth2AuthorizationCodeToken == null) {
             return null;
         }
         return new OAuth2AuthorizationCodeGrantAuthorization.AuthorizationCode(
@@ -102,7 +128,7 @@ public class ModelMapper {
 
     private static OAuth2AuthorizationGrantAuthorization.AccessToken getAccessTokenForEntity(OAuth2Authorization authorization) {
         OAuth2Authorization.Token<OAuth2AccessToken> oAuth2AuthorizationAccessToken = authorization.getAccessToken();
-        if (oAuth2AuthorizationAccessToken == null){
+        if (oAuth2AuthorizationAccessToken == null) {
             return null;
         }
         OAuth2AuthorizationGrantAuthorization.ClaimsHolder claimsHolder = new OAuth2AuthorizationGrantAuthorization.ClaimsHolder(
@@ -122,7 +148,7 @@ public class ModelMapper {
 
     private static OAuth2AuthorizationGrantAuthorization.RefreshToken getRefreshTokenForEntity(OAuth2Authorization authorization) {
         OAuth2Authorization.Token<OAuth2RefreshToken> oAuth2AuthorizationRefreshToken = authorization.getRefreshToken();
-        if (oAuth2AuthorizationRefreshToken == null){
+        if (oAuth2AuthorizationRefreshToken == null) {
             return null;
         }
         return new OAuth2AuthorizationGrantAuthorization.RefreshToken(

@@ -6,5 +6,10 @@ spring:
     username: postgres
     password: postgres
     url: jdbc:postgresql://localhost:5432/auth_server
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
 server:
   port: 9000
+debug: true
