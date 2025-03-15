@@ -17,7 +17,7 @@ public class ModelMapper {
 
     public static OAuth2AuthorizationGrantAuthorization convertOAuth2AuthorizationToOidcGrant(OAuth2Authorization authorization) {
 
-        OAuth2AuthorizationRequest oAuth2AuthorizationRequest = authorization.getAttribute("authorizationRequest");
+        OAuth2AuthorizationRequest oAuth2AuthorizationRequest = authorization.getAttribute("org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest");
         Objects.requireNonNull(oAuth2AuthorizationRequest, "Authorization Request is null");
 
         OidcAuthorizationCodeGrantAuthorization.IdToken idToken = getOidcTokenForEntity(authorization);
@@ -31,7 +31,7 @@ public class ModelMapper {
         return new OidcAuthorizationCodeGrantAuthorization(
                 authorization.getId(), authorization.getRegisteredClientId(), authorization.getPrincipalName(),
                 authorization.getAuthorizedScopes(), accessToken, refreshToken,
-                authorization.getAttribute("principal"), authorization.getAuthorizationGrantType(),
+                authorization.getAttribute("java.security.Principal"), authorization.getAuthorizationGrantType(),
                 oAuth2AuthorizationRequest, authorizationCode, oAuth2AuthorizationRequest.getState(),
                 idToken);
     }
@@ -60,10 +60,10 @@ public class ModelMapper {
                 oAuth2AuthorizationBuilder.token(oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationCode());
             }
             if (oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationRequest() != null) {
-                oAuth2AuthorizationBuilder.attribute("authorizationRequest", oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationRequest());
+                oAuth2AuthorizationBuilder.attribute("org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest", oAuth2AuthorizationCodeGrantAuthorization.getAuthorizationRequest());
             }
             if (oAuth2AuthorizationCodeGrantAuthorization.getPrincipal() != null) {
-                oAuth2AuthorizationBuilder.attribute("principal", oAuth2AuthorizationCodeGrantAuthorization.getPrincipal());
+                oAuth2AuthorizationBuilder.attribute("java.security.Principal", oAuth2AuthorizationCodeGrantAuthorization.getPrincipal());
             }
         }
 
@@ -81,6 +81,9 @@ public class ModelMapper {
 
     private static OidcAuthorizationCodeGrantAuthorization.IdToken getOidcTokenForEntity(OAuth2Authorization authorization) {
         OAuth2Authorization.Token<OidcIdToken> oidcIdToken = authorization.getToken(OidcIdToken.class);
+        if (oidcIdToken == null){
+            return null;
+        }
         OAuth2AuthorizationGrantAuthorization.ClaimsHolder claimsHolder = new OAuth2AuthorizationGrantAuthorization.ClaimsHolder(
                 Objects.requireNonNull(oidcIdToken, "OIDC TOKEN IS NULL").getClaims());
         return new OidcAuthorizationCodeGrantAuthorization.IdToken(oidcIdToken.getToken().getTokenValue(),
@@ -89,7 +92,9 @@ public class ModelMapper {
 
     private static OAuth2AuthorizationCodeGrantAuthorization.AuthorizationCode getAuthorizationCodeForEntity(OAuth2Authorization authorization) {
         OAuth2Authorization.Token<OAuth2AuthorizationCode> oAuth2AuthorizationCodeToken = authorization.getToken(OAuth2AuthorizationCode.class);
-        Objects.requireNonNull(oAuth2AuthorizationCodeToken, "AUTHORIZATION CODE TOKEN IS NULL");
+        if (oAuth2AuthorizationCodeToken == null){
+            return null;
+        }
         return new OAuth2AuthorizationCodeGrantAuthorization.AuthorizationCode(
                 oAuth2AuthorizationCodeToken.getToken().getTokenValue(), oAuth2AuthorizationCodeToken.getToken().getIssuedAt(),
                 oAuth2AuthorizationCodeToken.getToken().getExpiresAt(), oAuth2AuthorizationCodeToken.isInvalidated());
@@ -97,6 +102,9 @@ public class ModelMapper {
 
     private static OAuth2AuthorizationGrantAuthorization.AccessToken getAccessTokenForEntity(OAuth2Authorization authorization) {
         OAuth2Authorization.Token<OAuth2AccessToken> oAuth2AuthorizationAccessToken = authorization.getAccessToken();
+        if (oAuth2AuthorizationAccessToken == null){
+            return null;
+        }
         OAuth2AuthorizationGrantAuthorization.ClaimsHolder claimsHolder = new OAuth2AuthorizationGrantAuthorization.ClaimsHolder(
                 oAuth2AuthorizationAccessToken.getClaims()
         );
@@ -114,7 +122,9 @@ public class ModelMapper {
 
     private static OAuth2AuthorizationGrantAuthorization.RefreshToken getRefreshTokenForEntity(OAuth2Authorization authorization) {
         OAuth2Authorization.Token<OAuth2RefreshToken> oAuth2AuthorizationRefreshToken = authorization.getRefreshToken();
-        Objects.requireNonNull(oAuth2AuthorizationRefreshToken, "REFRESH TOKEN IS NULL");
+        if (oAuth2AuthorizationRefreshToken == null){
+            return null;
+        }
         return new OAuth2AuthorizationGrantAuthorization.RefreshToken(
                 oAuth2AuthorizationRefreshToken.getToken().getTokenValue(),
                 oAuth2AuthorizationRefreshToken.getToken().getIssuedAt(),
