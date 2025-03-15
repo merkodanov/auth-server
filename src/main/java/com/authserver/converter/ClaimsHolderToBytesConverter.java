@@ -1,6 +1,7 @@
 package com.authserver.converter;
 
 import com.authserver.model.OAuth2AuthorizationGrantAuthorization;
+import jakarta.annotation.Nullable;
 import org.springframework.core.convert.converter.Converter;
 
 import java.io.ByteArrayOutputStream;
@@ -10,7 +11,7 @@ import java.io.ObjectOutputStream;
 public class ClaimsHolderToBytesConverter implements
         Converter<OAuth2AuthorizationGrantAuthorization.ClaimsHolder, byte[]> {
     @Override
-    public byte[] convert(OAuth2AuthorizationGrantAuthorization.ClaimsHolder source) {
+    public byte[] convert(@Nullable OAuth2AuthorizationGrantAuthorization.ClaimsHolder source) {
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
              ObjectOutputStream oos = new ObjectOutputStream(bos)) {
             oos.writeObject(source);
