@@ -1,6 +1,8 @@
 spring:
   application:
     name: auth-server
+  mvc:
+    static-path-pattern: /static/**
   datasource:
     driver-class-name: org.postgresql.Driver
     username: postgres
