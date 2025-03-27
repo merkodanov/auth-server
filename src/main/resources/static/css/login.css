@@ -1,0 +1,36 @@
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+form button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background: blue;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+form h1 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+form button:hover {
+    background: darkblue;
+}

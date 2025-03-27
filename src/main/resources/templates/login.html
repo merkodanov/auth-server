@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Login page</title>
+    <link rel="stylesheet" href="../static/css/login.css">
 </head>
 <body>
-<form method="post" th:action="@{/login}">
-<!--    Spring Security requires that field be "username"-->
-    <input type="text" id="username" name="username" required autofocus>
-    <label for="username">Email</label>
-    <input type="password" id="password" name="password" required>
-    <label for="password">Password</label>
-    <button type="submit">Send</button>
-</form>
+<div class="form-container">
+    <form method="post" th:action="@{/login}">
+        <!--    Spring Security requires that field be "username"-->
+        <h1>Вход</h1>
+        <label for="username" style="display: block">Email</label>
+        <input type="text" id="username" name="username" required autofocus>
+        <label for="password" style="display:block;">Password</label>
+        <input type="password" id="password" name="password" required>
+        <button type="submit" style="display: block">Send</button>
+    </form>
+</div>
 </body>
 </html>
