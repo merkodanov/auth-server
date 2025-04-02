@@ -3,14 +3,43 @@ spring:
     name: auth-server
   mvc:
     static-path-pattern: /static/**
+  profiles:
+    active: dev
+server:
+  port: 9000
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
   datasource:
     driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: postgres
-    url: jdbc:postgresql://localhost:5432/auth_server
+    username: ${DB_USER_DEV}
+    password: ${DB_USER_PASSWORD_DEV}
+    url: jdbc:postgresql://localhost:5432/${DB_NAME_DEV}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create
   data:
     redis:
       host: localhost
       port: 6379
-server:
-  port: 9000
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USER_PROD}
+    password: ${DB_USER_PASSWORD_PROD}
+    url: jdbc:postgresql://db:5432/${DB_NAME_PROD}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create
+  data:
+    redis:
+      host: redis
+      port: 6379
